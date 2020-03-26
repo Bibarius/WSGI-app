@@ -13,6 +13,13 @@ class Auth():
         if 'HTTP_COOKIE' in environ:
             cookie = SimpleCookie(environ['HTTP_COOKIE'])
 
+            if environ['PATH_INFO'] == '/logout.html':
+                db.delete_session(cookie['session_id'].coded_value)
+                environ['wsgi_authorised'] = False
+                environ['PATH_INFO'] = '/login.html'
+                return self.app(environ, start_response)
+
+
             if 'session_id' in cookie and db.find_session(cookie['session_id'].coded_value):
                 environ['wsgi_authorised'] = True
  

@@ -25,6 +25,19 @@ def add_session(email, password, session_id):
     con.commit()
     con.close()
 
+@dir_change
+def delete_session(session_id):
+    database_name = 'users.db'
+    con = sqlite3.connect(database_name)
+    cursor = con.cursor()
+    cursor.execute("""
+                    UPDATE users 
+                    SET sessionid = NULL
+                    WHERE sessionid == :session_id
+               """, {'session_id': session_id})
+    
+    con.commit()
+    con.close()
 
 @dir_change
 def find_session(session_id) -> bool:
@@ -77,3 +90,4 @@ def find_user(email, password):
     return False
 
 
+delete_session(3343959872)

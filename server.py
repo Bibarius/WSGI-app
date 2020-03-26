@@ -10,14 +10,15 @@ from http.cookies import SimpleCookie
 import database.database as db
 
 
-
-
+@Auth
+@Form
 def frontend(environ, respond):
     
     fn = os.path.join(path, environ['PATH_INFO'][1:])
 
     if environ['wsgi_authorised'] == True:  #?поверка авторизации
-        fn = 'frontend/success.html'
+        if '.' not in fn.split(os.path.sep)[-1] or fn == 'frontend/login.html':
+            fn = 'frontend/dashboard.html'
 
     elif '.' not in fn.split(os.path.sep)[-1]:
         fn = os.path.join(fn, 'index.html')
@@ -33,9 +34,6 @@ def frontend(environ, respond):
     else:
         respond('404 Not Found', [('Content-Type', 'text/plain')])
         return [b'not found']
-
-frontend = Form(frontend)
-frontend = Auth(frontend)
 
 
 if __name__ == '__main__':
