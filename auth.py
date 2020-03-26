@@ -2,6 +2,7 @@ from http.cookies import SimpleCookie
 from paste.session import SessionMiddleware
 from urllib.parse import urlparse, parse_qs
 import time
+import database.database as db
 
 class Auth():
     def __init__(self, app):
@@ -11,12 +12,8 @@ class Auth():
 
         if 'HTTP_COOKIE' in environ:
             cookie = SimpleCookie(environ['HTTP_COOKIE'])
-            sessions = []
-            with open("database/sessions.txt") as file_handler:
-                for line in file_handler:
-                    sessions.append(line[:-1])
 
-            if 'session_id' in cookie and cookie['session_id'].coded_value in sessions:
+            if 'session_id' in cookie and db.find_session(cookie['session_id'].coded_value):
                 environ['wsgi_authorised'] = True
  
             else:
