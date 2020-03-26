@@ -1,11 +1,12 @@
 import sys
 import os
-import time
+import uuid
 import mimetypes
 from wsgiref import simple_server, util
 from urllib.parse import urlparse, parse_qs
 from auth import Auth
 from http.cookies import SimpleCookie
+import database.database as db
 
 
 class Form():
@@ -20,11 +21,13 @@ class Form():
             email = str(parsed[b'email'][0], 'utf-8')
             password = str(parsed[b'password'][0], 'utf-8')
             
-            with open("database/users.txt", 'a') as file_handler:
-                file_handler.write(email)
-                file_handler.write(',')
-                file_handler.write(password)
-                file_handler.write('\n')
+            db.add_user(email, password)
+
+            # with open("database/users.txt", 'a') as file_handler:
+            #     file_handler.write(email)
+            #     file_handler.write(',')
+            #     file_handler.write(password)
+            #     file_handler.write('\n')
 
         elif environ['REQUEST_METHOD'] == 'POST' and environ['PATH_INFO'] == '/login.html':
             length = int(environ['CONTENT_LENGTH'])
@@ -33,23 +36,12 @@ class Form():
             email = str(parsed[b'email'][0], 'utf-8')
             password = str(parsed[b'password'][0], 'utf-8')
 
-            with open("database/users.txt", 'r') as file_handler:
-                for user in file_handler:
-                    if user == '\n':
-                        continue
-                    db_email, db_password = user.split(',')
-                    db_password = db_password[:-1]
-                    if email == db_email and password == db_password:
-                        session_id = time.time()
-                        
-                        environ['session_id'] = session_id
+            if db.find_user(email, password):
+                session_id = int(uuid.uuid1().fields[0])
+                environ['session_id'] = session_id
 
-                        with open("database/sessions.txt", 'a') as sessions:
-                            sessions.write(str(session_id))
-                            sessions.write(str('\n'))
-
-                        environ['wsgi_authorised'] = True
-
+                db.add_session(email, password, session_id)
+                environ['wsgi_authorised'] = True
 
         return self.app(environ, start_response)
 
