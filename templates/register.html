@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Зарегистрироваться{% endblock %}
+{%block style%}
+    <link rel="stylesheet" href="css/style.css">
+{% endblock %}
+
+{% block content %}
+  <div class="form-container">
+    <h1>Зарегистрироваться</h1>
+    <form method="POST">
+        <p><b>Введите логин и пароль</b></p>
+        <p><input type="email" name="email">Email<Br>
+        <input type="password" name="password">Password<Br>
+        <input type="password" name="password">Repeat password<Br>
+        <p><input type="submit" value="регистрация"></p>
+        <a href="login.html">Войти</a>
+      </form>
+  </div>
+{% endblock %}
